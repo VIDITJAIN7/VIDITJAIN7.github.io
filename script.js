@@ -1,42 +1,51 @@
 (() => {
-  if (window.location.hash) {
-    window.setTimeout(() => {
-      const target = document.querySelector(window.location.hash);
-      if (target && target.getBoundingClientRect().top < 96) window.scrollTo(0, window.scrollY - 96);
-    }, 120);
-  }
-  const menu = document.querySelector('.menu-toggle');
-  const links = document.querySelector('.nav-links');
-  if (menu && links) {
-    menu.addEventListener('click', () => {
-      const open = links.classList.toggle('is-open');
-      menu.setAttribute('aria-expanded', String(open));
-    });
-    links.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => links.classList.remove('is-open')));
-  }
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const syncMotion = () => document.documentElement.classList.toggle('motion-enabled', !reducedMotion.matches);
+  syncMotion();
+  reducedMotion.addEventListener('change', syncMotion);
 
-  const revealItems = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // Draw each explanatory diagram once when it enters the reading area.
+  // All text and diagrams remain visible without JavaScript.
+  const figures = document.querySelectorAll('.process-figure, .fusion-figure');
+  if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: .12 });
-    revealItems.forEach((item) => observer.observe(item));
-  } else revealItems.forEach((item) => item.classList.add('is-visible'));
-
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll('.tilt').forEach((card) => {
-      card.addEventListener('pointermove', (event) => {
-        const rect = card.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width - .5;
-        const y = (event.clientY - rect.top) / rect.height - .5;
-        card.style.transform = `perspective(900px) rotateX(${y * -3}deg) rotateY(${x * 3}deg) translateY(-3px)`;
-      });
-      card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-    });
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
+      }
+    }, { threshold: .25 });
+    figures.forEach(figure => observer.observe(figure));
   }
+
+  const sections = [...document.querySelectorAll('.entries > .entry')];
+  const links = [...document.querySelectorAll('.contents a')];
+  const readingTrack = document.querySelector('.reading-track');
+  if (!sections.length) return;
+
+  let queued = false;
+  const updateReadingPosition = () => {
+    const threshold = window.innerWidth <= 760 ? 180 : 170;
+    let current = sections[0];
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= threshold) current = section;
+    }
+    for (const link of links) {
+      if (link.hash === '#' + current.id) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    }
+    const first = sections[0].getBoundingClientRect().top + window.scrollY;
+    const last = sections[sections.length - 1].getBoundingClientRect().bottom + window.scrollY;
+    const progress = Math.min(1, Math.max(0, (window.scrollY + threshold - first) / Math.max(1, last - first - window.innerHeight + threshold)));
+    if (readingTrack) readingTrack.style.setProperty('--read-progress', progress);
+    queued = false;
+  };
+  const queueUpdate = () => {
+    if (!queued) { queued = true; requestAnimationFrame(updateReadingPosition); }
+  };
+  window.addEventListener('scroll', queueUpdate, { passive: true });
+  window.addEventListener('resize', queueUpdate);
+  window.addEventListener('load', queueUpdate);
+  document.querySelectorAll('details').forEach(detail => detail.addEventListener('toggle', queueUpdate));
+  updateReadingPosition();
 })();
