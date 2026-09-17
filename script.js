@@ -19,9 +19,22 @@
   }
 
   const sections = [...document.querySelectorAll('.entries > .entry')];
+  const entries = document.querySelector('.entries');
   const links = [...document.querySelectorAll('.contents a')];
   const readingTrack = document.querySelector('.reading-track');
   if (!sections.length) return;
+
+  if (!reducedMotion.matches && 'IntersectionObserver' in window) {
+    entries.classList.add('has-scroll-state');
+    const cardObserver = new IntersectionObserver((observations) => {
+      for (const observation of observations) {
+        if (observation.isIntersecting) {
+          sections.forEach(section => section.classList.toggle('is-current', section === observation.target));
+        }
+      }
+    }, { rootMargin: '-38% 0px -38% 0px', threshold: 0 });
+    sections.forEach(section => cardObserver.observe(section));
+  }
 
   let queued = false;
   const updateReadingPosition = () => {

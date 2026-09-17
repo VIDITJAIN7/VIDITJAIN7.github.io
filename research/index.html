@@ -7,18 +7,17 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=editorial-3"><script src="/script.js?v=editorial-3" defer></script>
+<link rel="stylesheet" href="/styles.css?v=editorial-4"><script src="/script.js?v=editorial-4" defer></script>
 </head>
 <body class="page-research">
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header"><div class="shell header-inner">
 <a class="wordmark" href="/" aria-label="Vidit Jain home">vj<span class="wordmark-dot">.</span></a>
 <nav class="primary-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/research/" aria-current="page">Research</a><a href="/projects/">Projects</a><a href="/about/">About</a></nav>
-<span class="header-note">COMPUTER SCIENCE / DUBAI</span>
 </div></header>
-<main id="main"><header class="shell page-intro"><p class="kicker">02 / RESEARCH</p><h1>Research<em>& enquiries.</em></h1><p class="page-description">Quantum machine learning, demographic nowcasting, public transport, and error correction. Current work and findings from my research reports.</p></header><div class="shell reading-layout"><aside class="contents"><nav aria-label="Research contents"><p class="kicker">ON THIS PAGE</p><a href="#quantum"><span class="toc-number">01</span><span>Quantum security</span></a><a href="#migration"><span class="toc-number">02</span><span>Migration nowcasting</span></a><a href="#transport"><span class="toc-number">03</span><span>Public transport</span></a><a href="#ecc"><span class="toc-number">04</span><span>Error correction</span></a><div class="reading-track" aria-hidden="true"><span></span></div></nav></aside><div class="entries">
+<main id="main"><header class="shell page-intro"><p class="kicker">RESEARCH</p><h1>Research<em>& enquiries.</em></h1><p class="page-description">Quantum machine learning, demographic nowcasting, public transport, and error correction. Current work and findings from my research reports.</p></header><div class="shell reading-layout"><aside class="contents"><nav aria-label="Research contents"><p class="kicker">ON THIS PAGE</p><a href="#quantum"><span>Quantum security</span></a><a href="#migration"><span>Migration nowcasting</span></a><a href="#transport"><span>Public transport</span></a><a href="#ecc"><span>Error correction</span></a><div class="reading-track" aria-hidden="true"><span></span></div></nav></aside><div class="entries">
 <article class="entry" id="quantum">
-<p class="entry-meta">01 / QUANTUM COMPUTING · SEPTEMBER 2026—PRESENT</p>
+<p class="entry-meta">QUANTUM COMPUTING · SEPTEMBER 2026—PRESENT</p>
 <h2>Defense against circuit-level threats in quantum federated learning</h2>
 <p class="byline">Advised by Dr. Ashish Gupta · BITS Pilani Dubai Campus</p>
 <p class="entry-lead">How can a federated quantum model remain reliable when a participant’s circuit has been manipulated?</p>
@@ -28,7 +27,7 @@
 <details class="entry-details"><summary>Research approach<span aria-hidden="true">+</span></summary><div class="details-body"><p>The analysis considers attacker stealth-budget constraints alongside changes in circuit states and model updates. This is ongoing research; evaluation results will be added as the work develops.</p></div></details>
 </article>
 <article class="entry" id="migration">
-<p class="entry-meta">02 / BAYESIAN INFERENCE · 2026</p>
+<p class="entry-meta">BAYESIAN INFERENCE · 2026</p>
 <h2>Nowcasting migration<br><em>in the UAE.</em></h2>
 <p class="byline">Advised by Dr. Mrutuyanjaya Sahu</p>
 <p class="entry-lead">Combining delayed administrative records with digital traces to estimate the present.</p>
@@ -39,18 +38,17 @@
 <details class="entry-details"><summary>Data, validation & limitations<span aria-hidden="true">+</span></summary><div class="details-body"><p>The report records a 64% reduction in RMSE against its baseline. Administrative sources can lag by 12–24 months; faster digital signals require correction for platform penetration and source bias.</p><p>The credible interval is central to the result. Digital traces are proxies, and the model’s estimates should be read alongside their uncertainty.</p></div></details>
 </article>
 <article class="entry" id="transport">
-<p class="entry-meta">03 / EXPLAINABLE AI · 2026</p>
+<p class="entry-meta">EXPLAINABLE AI · 2026</p>
 <h2>Understanding congestion<br><em>across Dubai’s transit network.</em></h2>
 <p class="byline">Counterfactual explanations · Advised by Dr. Mrutuyanjaya Sahu</p>
 <p class="entry-lead">Forecasting congestion, then asking which operational changes could reduce it.</p>
 <p>A GCN-GRU model uses 8,784 hourly observations from 2024 across 29 metro stations and six bus hubs. NSGA-II searches for changes in parking capacity, bus frequency, service headway, and fare class against a target of 30% lower peak congestion.</p>
-<figure class="transit-figure"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/A_day_in_the_city_in_Dubai_%28Unsplash%29.jpg/960px-A_day_in_the_city_in_Dubai_%28Unsplash%29.jpg" alt="Dubai Metro above Sheikh Zayed Road, the setting of the transport study" width="960" height="480" loading="lazy"><figcaption>Dubai Metro · Context photograph by Harshal Hirve / <a href="https://commons.wikimedia.org/wiki/File:A_day_in_the_city_in_Dubai_(Unsplash).jpg" target="_blank" rel="noreferrer">Wikimedia Commons, CC0</a></figcaption></figure>
 <dl class="metrics"><div><dt>R²</dt><dd>0.9580</dd></div><div><dt>RMSE</dt><dd>0.0434</dd></div><div><dt>Network nodes</dt><dd>35</dd></div></dl>
 <p class="terms"><span>GCN-GRU</span><span>NSGA-II</span><span>RTA / Open-Meteo / OSM</span></p>
 <details class="entry-details"><summary>Findings & model caveats<span aria-hidden="true">+</span></summary><div class="details-body"><p>The counterfactual search suggests increasing feeder-bus frequency at BurJuman (+80%), Union (+60%), and Al Rigga (+55%). These are model recommendations, not implemented changes or observed improvements.</p><p>The report flags counterintuitive headway increases as a model artifact requiring transport-domain validation. The 30% reduction is a search target, not a measured real-world result.</p></div></details>
 </article>
 <article class="entry" id="ecc">
-<p class="entry-meta">04 / INDEPENDENT RESEARCH · FEBRUARY—JUNE 2025</p>
+<p class="entry-meta">INDEPENDENT RESEARCH · FEBRUARY—JUNE 2025</p>
 <h2>Hybrid error correction<br><em>for reliable memory.</em></h2>
 <p class="entry-lead">Combining BCH codes and machine learning for multi-bit error correction in high-speed RAM.</p>
 <p>I designed and evaluated a hybrid approach to study the relationship between error reduction and correction latency in high-performance computing systems.</p>
