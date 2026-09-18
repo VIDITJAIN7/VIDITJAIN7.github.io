@@ -32,7 +32,7 @@ em { font-family: var(--serif); font-weight: 400; }
 .site-header { position: sticky; top: 0; z-index: 30; overflow: visible; background: transparent; border-bottom: 1px solid transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; transition: background .55s var(--ease), border-color .55s ease, box-shadow .55s ease; }
 .site-header::after { content: ""; position: absolute; z-index: -1; inset: 0 -2% -24px; background: linear-gradient(180deg, transparent 0%, rgba(163,222,215,.025) 54%, transparent 100%); filter: blur(9px); opacity: .9; pointer-events: none; }
 .header-inner { height: 84px; display: flex; align-items: center; gap: 40px; }
-.wordmark { position: fixed; z-index: 61; top: 20px; left: max(20px, calc((100vw - min(1360px, calc(100vw - 112px))) / 2)); font: italic 500 44px/.9 var(--serif); letter-spacing: -.1em; text-shadow: 0 2px 18px rgba(163,222,215,.08); }
+.wordmark { position: fixed !important; z-index: 61; top: 20px; left: max(20px, calc((100vw - min(1360px, calc(100vw - 112px))) / 2)); font: italic 500 44px/.9 var(--serif); letter-spacing: -.1em; text-shadow: 0 2px 18px rgba(163,222,215,.08); }
 .wordmark-dot { color: var(--accent); }
 
 /* A quiet liquid-glass dock keeps navigation close without competing with the artwork. */
