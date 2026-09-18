@@ -3,6 +3,43 @@
   const motion = true;
   document.documentElement.classList.add('motion-running');
 
+  // The dock starts as part of the transparent header, then gradually separates
+  // into a soft liquid-glass pill as the page heading passes behind it.
+  function setupDockGlass() {
+    const header = document.querySelector('.site-header');
+    const dock = document.querySelector('.dock-glass');
+    const heading = document.querySelector('.page-intro h1, .name-title');
+    if (!header || !dock || !heading) return;
+    let fullAt = 1;
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const progress = Math.max(0, Math.min(1, scrollY / fullAt));
+      dock.style.setProperty('--dock-progress', progress.toFixed(3));
+      dock.style.setProperty('--dock-fill-alpha', (progress * .34).toFixed(3));
+      dock.style.setProperty('--dock-edge-alpha', (progress * .22).toFixed(3));
+      dock.style.setProperty('--dock-shadow-alpha', (progress * .22).toFixed(3));
+      dock.style.setProperty('--dock-highlight-alpha', (progress * .12).toFixed(3));
+      dock.style.setProperty('--dock-blur', `${(progress * 18).toFixed(1)}px`);
+    };
+    const measure = () => {
+      const headingTop = heading.getBoundingClientRect().top + scrollY;
+      fullAt = Math.max(1, headingTop - header.getBoundingClientRect().height);
+      update();
+    };
+    const queueUpdate = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+    addEventListener('scroll', queueUpdate, {passive:true});
+    addEventListener('resize', measure);
+    addEventListener('pageshow', measure);
+    document.fonts?.ready.then(measure);
+    measure();
+  }
+  setupDockGlass();
+
   // Reveal on arrival, never leave content hidden when scripts fail or are disabled.
   if ('IntersectionObserver' in window) {
     const reveal = new IntersectionObserver((observations, observer) => {
@@ -31,7 +68,92 @@
     document.querySelectorAll('.reveal, .case-heading-inner').forEach(node => reveal.observe(node));
   }
 
+  function setupWorkCarousel(stage) {
+    const cards=[...stage.querySelectorAll('.entry')];
+    const layout=stage.parentElement;
+    const contents=layout?.querySelector('.contents');
+    const links=[...(contents?.querySelectorAll('a') || [])];
+    if(!cards.length) return;
+    layout?.classList.add('work-carousel-layout');
+    stage.classList.add('work-carousel');
+    let active=0, dragging=false, startX=0, dragX=0, suppressClick=false;
+    const wrap=(index)=>((index%cards.length)+cards.length)%cards.length;
+    const toggleFace=(card)=>card.classList.toggle('is-flipped');
+    cards.forEach((card,index)=>{
+      card.classList.add('work-card','has-details');
+      const heading=card.querySelector('.case-heading');
+      const content=card.querySelector('.case-content');
+      const front=document.createElement('div'); front.className='work-face work-face-front';
+      const back=document.createElement('div'); back.className='work-face work-face-back';
+      if(heading) front.append(heading);
+      const visual=content?.querySelector('figure, .metrics, .learning-sequence');
+      if(visual) front.append(visual);
+      const cue=document.createElement('span'); cue.className='card-flip-cue'; cue.textContent='Click for details';
+      front.append(cue);
+      if(content) back.append(content);
+      const inner=document.createElement('div'); inner.className='work-card-inner'; inner.append(front,back);
+      card.replaceChildren(inner); card.tabIndex=0; card.setAttribute('role','button');
+      card.setAttribute('aria-label',`${heading?.querySelector('h2')?.textContent?.trim() || 'Work'} — click for details`);
+      card.addEventListener('click',event=>{
+        if(event.target.closest('a')) return;
+        if(suppressClick){ suppressClick=false; return; }
+        if(index!==active){ goTo(index); return; }
+        toggleFace(card);
+      });
+      card.addEventListener('keydown',event=>{
+        if(event.key==='Enter' || event.key===' ') { event.preventDefault(); toggleFace(card); }
+        if(event.key==='ArrowRight') { event.preventDefault(); goTo(index+1); }
+        if(event.key==='ArrowLeft') { event.preventDefault(); goTo(index-1); }
+      });
+      card.addEventListener('pointerdown',event=>{
+        if(event.pointerType==='mouse' && event.button!==0) return;
+        dragging=true; suppressClick=false; startX=event.clientX; dragX=0; card.setPointerCapture?.(event.pointerId);
+      });
+      card.addEventListener('pointermove',event=>{
+        if(!dragging || index!==active) return;
+        dragX=event.clientX-startX; card.style.setProperty('--drag-x',`${dragX}px`);
+        if(Math.abs(dragX)>10) suppressClick=true;
+      });
+      const finishDrag=()=>{
+        if(!dragging || index!==active) return;
+        dragging=false; card.style.setProperty('--drag-x','0px');
+        if(dragX<-78) goTo(active+1);
+        else if(dragX>78) goTo(active-1);
+        dragX=0;
+      };
+      card.addEventListener('pointerup',finishDrag);
+      card.addEventListener('pointercancel',finishDrag);
+    });
+    function goTo(index) {
+      active=wrap(index); cards.forEach(card=>card.classList.remove('is-flipped')); render();
+    }
+    function render() {
+      cards.forEach((card,index)=>{
+        const raw=index-active;
+        const wrapped=Math.abs(raw)>cards.length/2 ? (raw>0 ? raw-cards.length : raw+cards.length) : raw;
+        const distance=Math.abs(wrapped);
+        const visible=distance<=2;
+        card.style.setProperty('--card-x',`${wrapped*28}px`);
+        card.style.setProperty('--card-y',`${Math.min(distance,2)*28}px`);
+        card.style.setProperty('--card-scale',String(1-Math.min(distance,2)*.035));
+        card.style.opacity=visible ? String(1-distance*.22) : '0';
+        card.style.pointerEvents=index===active ? 'auto' : (visible ? 'auto' : 'none');
+        card.style.zIndex=String(100-distance);
+        card.setAttribute('aria-current',index===active?'true':'false');
+      });
+      links.forEach((link,index)=>{
+        if(index===active) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current');
+      });
+    }
+    links.forEach((link,index)=>link.addEventListener('click',event=>{event.preventDefault(); goTo(index);}));
+    render();
+  }
+
+  const carouselStage=document.querySelector('.page-research .entries, .page-projects .entries');
+  if(carouselStage) setupWorkCarousel(carouselStage);
   const sections = [...document.querySelectorAll('.entry')];
+  const carouselActive=Boolean(carouselStage);
+  if(!carouselActive) {
   const links = [...document.querySelectorAll('.contents a')];
   const track = document.querySelector('.reading-track');
   let queued = false;
@@ -74,6 +196,7 @@
   addEventListener('pageshow', queuePosition);
   document.fonts?.ready.then(queuePosition);
   updatePosition();
+  }
 
   /*
    * Canvas studies adapted from Ali Imam (@designali-in), via 21st.dev:
