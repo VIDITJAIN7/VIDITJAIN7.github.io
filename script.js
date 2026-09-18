@@ -201,5 +201,31 @@
   addEventListener('visibilitychange',refreshArt);
   addEventListener('pagehide',()=>{cancelAnimationFrame(frame);frame=0;});
   addEventListener('pageshow',refreshArt);
+
+  // A small, dependency-free dock interaction: nearby icons breathe outward from the pointer.
+  const dock=document.querySelector('.dock');
+  if(dock) {
+    const items=[...dock.querySelectorAll('.dock-item')];
+    const resetDock=()=>items.forEach(item=>{
+      item.style.setProperty('--dock-scale','1');
+      item.style.setProperty('--dock-lift','0px');
+    });
+    const updateDock=clientX=>items.forEach(item=>{
+      const rect=item.getBoundingClientRect();
+      const distance=Math.abs(clientX-(rect.left+rect.width/2));
+      const influence=Math.max(0,1-distance/142);
+      item.style.setProperty('--dock-scale',(1+influence*.28).toFixed(3));
+      item.style.setProperty('--dock-lift',`${(-influence*7).toFixed(2)}px`);
+    });
+    dock.addEventListener('pointermove',event=>{
+      if(event.pointerType!=='touch') updateDock(event.clientX);
+    },{passive:true});
+    dock.addEventListener('pointerleave',resetDock);
+    items.forEach(item=>{
+      item.addEventListener('focus',()=>item.classList.add('dock-focus'));
+      item.addEventListener('blur',()=>item.classList.remove('dock-focus'));
+    });
+    resetDock();
+  }
   refreshArt();
 })();
