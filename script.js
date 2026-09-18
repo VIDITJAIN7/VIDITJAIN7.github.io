@@ -44,7 +44,8 @@
     for (const section of sections) {
       const rect = section.getBoundingClientRect();
       if (rect.top <= threshold) current = section;
-      section.style.setProperty('--chapter-progress', String(Math.max(0, Math.min(1, (innerHeight - rect.top) / innerHeight))));
+      const chapterProgress = (threshold - rect.top) / Math.max(1, rect.height);
+      section.style.setProperty('--chapter-progress', String(Math.max(0, Math.min(1, chapterProgress))));
     }
     // Short final chapters may never reach the top reading line.
     if (scrollY + innerHeight >= document.documentElement.scrollHeight - 3) current = sections.at(-1);
