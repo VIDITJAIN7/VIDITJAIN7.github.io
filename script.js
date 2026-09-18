@@ -183,7 +183,8 @@
   document.querySelectorAll('canvas[data-art]').forEach(canvas=>{
     const ctx=canvas.getContext('2d');
     if(!ctx) return;
-    const item={canvas,ctx,kind:canvas.dataset.art,width:0,height:0,visible:true,focus:{x:0,y:0},pointer:{active:false,x:0,y:0}};
+    const kind = document.body.classList.contains('page-about') && canvas.classList.contains('intro-art') ? 'waves' : canvas.dataset.art;
+    const item={canvas,ctx,kind,width:0,height:0,visible:true,focus:{x:0,y:0},pointer:{active:false,x:0,y:0}};
     art.push(item); size(item);
     if('ResizeObserver' in window) new ResizeObserver(()=>size(item)).observe(canvas);
     else addEventListener('resize',()=>size(item));

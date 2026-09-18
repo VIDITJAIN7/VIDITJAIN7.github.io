@@ -16,7 +16,7 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 170px; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.8 var(--sans); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.8 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 ::selection { background: var(--accent); color: var(--bg); }
 a { color: inherit; text-decoration: none; }
 a, button { -webkit-tap-highlight-color: transparent; }
@@ -51,8 +51,8 @@ em { font-family: var(--serif); font-weight: 400; }
 
 /* A quiet, oversized signature with a responsive generative line study. */
 .home-composition { position: relative; isolation: isolate; min-height: max(560px,calc(100svh - 184px)); display: flex; flex-direction: column; justify-content: center; padding-block: 65px 110px; }
-.home-waves { position: absolute; inset: auto 0 0; width: 100%; height: 52%; opacity: .48; z-index: -2; pointer-events: none; mask-image: linear-gradient(0deg,#000,transparent 95%); }
-.ambient-dots { position: absolute; right: 0; top: 5%; width: 65%; height: 65%; opacity: .55; z-index: -1; pointer-events: none; }
+.home-waves { position: absolute; left: 50%; bottom: -1px; width: 100vw; height: 68%; transform: translateX(-50%); opacity: .48; z-index: -2; pointer-events: none; }
+.ambient-dots { position: absolute; left: 50%; top: 0; width: 100vw; height: 100%; transform: translateX(-50%); opacity: .42; z-index: -1; pointer-events: none; }
 .home-topline { display: flex; align-items: center; gap: 12px; }
 .home-topline::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .name-title { display: flex; align-items: baseline; font: 500 clamp(100px,17.2vw,260px)/1.02 var(--sans); letter-spacing: -.09em; margin: 28px 0 30px; white-space: nowrap; }
@@ -88,7 +88,7 @@ em { font-family: var(--serif); font-weight: 400; }
 .title-dot { color: var(--accent); font-family: var(--serif); }
 .page-intro h1 em { display: block; font-size: 1.08em; color: var(--accent); padding-left: .55em; margin-top: 4px; letter-spacing: -.035em; }
 .page-description { color: var(--muted); font-size: 14px; max-width: 360px; padding-bottom: 5px; }
-.intro-art { position: absolute; z-index: -1; right: 0; top: 12px; width: 48%; height: 160px; opacity: .38; mask-image: linear-gradient(90deg,transparent,#000 40%,transparent); }
+.intro-art { position: absolute; z-index: -1; inset: 0 auto 0 50%; width: 100vw; height: 100%; transform: translateX(-50%); opacity: .34; pointer-events: none; }
 
 /* The index stays above the work. Each heading stays beside its story. */
 .reading-layout { position: relative; }
@@ -215,8 +215,8 @@ figcaption { font: 9px/1.8 var(--mono); color: var(--quiet); margin-top: 16px; }
   .home-caption .home-affiliation span { font-size: 8px; }
   .home-topline .kicker { font-size: 8px; }
   .name-title { font-size: 18.8vw; margin-block: 30px; }
-  .ambient-dots { width: 85%; height: 260px; top: 30px; }
-  .home-waves { height: 50%; opacity: .7; }
+  .ambient-dots { width: 100vw; height: 100%; top: 0; }
+  .home-waves { height: 70%; opacity: .7; }
   .home-under-title .kicker { font-size: 7px; }
   .home-body { display: flex; flex-direction: column; gap: 28px; padding-top: 28px; }
   .home-intro { width: 100%; }
@@ -227,7 +227,7 @@ figcaption { font: 9px/1.8 var(--mono); color: var(--quiet); margin-top: 16px; }
   .page-intro > .kicker { font-size: 9px; margin-bottom: 20px; }
   .page-intro h1 { font-size: clamp(57px,12vw,82px); }
   .page-description { max-width: 480px; margin-top: 26px; font-size: 13px; }
-  .intro-art { width: 65%; height: 130px; right: -30px; opacity: .32; }
+  .intro-art { width: 100vw; height: 100%; opacity: .28; }
   .contents { top: 73px; margin-inline: -20px; padding-inline: 20px; }
   .contents nav { overflow-x: auto; gap: 23px; scrollbar-width: none; min-height: 54px; }
   .contents nav::-webkit-scrollbar { display: none; }
