@@ -1,30 +1,7 @@
 (() => {
   'use strict';
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let preference = null;
-  try { preference = localStorage.getItem('portfolio-motion'); } catch {}
-  let motion = preference === 'running' || (preference !== 'paused' && !reducedMotion.matches);
-  const toggles = [...document.querySelectorAll('.motion-toggle')];
-  const syncMotion = () => {
-    motion = preference === 'running' || (preference !== 'paused' && !reducedMotion.matches);
-    document.documentElement.classList.toggle('motion-paused', !motion);
-    document.documentElement.classList.toggle('motion-running', motion);
-    toggles.forEach(button => {
-      button.hidden = false;
-      button.setAttribute('aria-pressed', String(!motion));
-      button.setAttribute('aria-label', motion ? 'Pause decorative animations' : 'Resume decorative animations');
-      button.querySelector('.motion-state').textContent = motion ? 'on' : 'off';
-    });
-    if (!motion) document.getAnimations().forEach(animation => animation.finish());
-  };
-  toggles.forEach(button => button.addEventListener('click', () => {
-    preference = motion ? 'paused' : 'running';
-    try { localStorage.setItem('portfolio-motion', preference); } catch {}
-    syncMotion();
-    refreshArt();
-  }));
-  reducedMotion.addEventListener('change', () => { syncMotion(); refreshArt(); });
-  syncMotion();
+  const motion = true;
+  document.documentElement.classList.add('motion-running');
 
   // Reveal on arrival, never leave content hidden when scripts fail or are disabled.
   if ('IntersectionObserver' in window) {

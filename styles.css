@@ -45,10 +45,7 @@ em { font-family: var(--serif); font-weight: 400; }
 .footer-links a span, .text-link span, .project-title > a span { color: var(--accent); display: inline-block; transition: transform .25s var(--ease); }
 .footer-links a:hover, .text-link:hover { color: var(--text); }
 .footer-links a:hover span, .text-link:hover span, .project-title > a:hover span { transform: translate(3px,-3px); }
-.motion-toggle { border: 0; background: none; cursor: pointer; padding: 8px 0; font: 10px var(--mono); color: var(--quiet); }
-.motion-toggle[hidden] { display: none; }
 .motion-state { color: var(--accent); margin-left: 5px; }
-.motion-toggle:hover { color: var(--text); }
 .text-link { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 6px; transition: text-decoration-color .2s; }
 .text-link:hover { text-decoration-color: var(--accent); }
 
@@ -86,6 +83,7 @@ em { font-family: var(--serif); font-weight: 400; }
 /* Chapter titles share the artwork vocabulary with the home and profile. */
 .page-intro { position: relative; isolation: isolate; padding-block: 64px 54px; min-height: 340px; overflow: hidden; display: grid; grid-template-columns: 1fr 350px; align-items: end; gap: 0 8%; }
 .page-intro > .kicker { grid-column: 1/-1; color: var(--accent); margin-bottom: 24px; }
+.page-intro > .kicker { display: none; }
 .page-intro h1 { font: 500 clamp(62px,7.6vw,112px)/.95 var(--sans); letter-spacing: -.065em; }
 .title-dot { color: var(--accent); font-family: var(--serif); }
 .page-intro h1 em { display: block; font-size: 1.08em; color: var(--accent); padding-left: .55em; margin-top: 4px; letter-spacing: -.035em; }
