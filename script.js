@@ -86,7 +86,7 @@
       const front=document.createElement('div'); front.className='work-face work-face-front';
       const back=document.createElement('div'); back.className='work-face work-face-back';
       if(heading) front.append(heading);
-      const visual=content?.querySelector('figure, .metrics, .learning-sequence');
+      const visual=content?.querySelector('.slide-visual') || content?.querySelector('figure, .metrics, .learning-sequence');
       if(visual) front.append(visual);
       const cue=document.createElement('span'); cue.className='card-flip-cue'; cue.textContent='Click for details';
       front.append(cue);
@@ -107,7 +107,7 @@
       });
       card.addEventListener('pointerdown',event=>{
         if(event.pointerType==='mouse' && event.button!==0) return;
-        dragging=true; suppressClick=false; startX=event.clientX; dragX=0; card.setPointerCapture?.(event.pointerId);
+        dragging=true; suppressClick=false; startX=event.clientX; dragX=0; stage.classList.add('is-dragging'); card.setPointerCapture?.(event.pointerId);
       });
       card.addEventListener('pointermove',event=>{
         if(!dragging || index!==active) return;
@@ -116,7 +116,7 @@
       });
       const finishDrag=()=>{
         if(!dragging || index!==active) return;
-        dragging=false; card.style.setProperty('--drag-x','0px');
+        dragging=false; card.style.setProperty('--drag-x','0px'); stage.classList.remove('is-dragging');
         if(dragX<-78) goTo(active+1);
         else if(dragX>78) goTo(active-1);
         dragX=0;
@@ -133,8 +133,8 @@
         const wrapped=Math.abs(raw)>cards.length/2 ? (raw>0 ? raw-cards.length : raw+cards.length) : raw;
         const distance=Math.abs(wrapped);
         const visible=distance<=2;
-        card.style.setProperty('--card-x',`${wrapped*28}px`);
-        card.style.setProperty('--card-y',`${Math.min(distance,2)*28}px`);
+        card.style.setProperty('--card-x',`${wrapped*32}px`);
+        card.style.setProperty('--card-y',`${Math.min(distance,2)*40}px`);
         card.style.setProperty('--card-scale',String(1-Math.min(distance,2)*.035));
         card.style.opacity=visible ? String(1-distance*.22) : '0';
         card.style.pointerEvents=index===active ? 'auto' : (visible ? 'auto' : 'none');
