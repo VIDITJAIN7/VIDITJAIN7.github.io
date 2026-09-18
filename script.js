@@ -131,10 +131,18 @@
   }
 
   function setupWorkCarousel(stage) {
-    const cards=[...stage.querySelectorAll('.entry')];
+    const cards=[...stage.querySelectorAll('.entry')]
+      .map((card,index)=>({card,index}))
+      .sort((a,b)=>(Number(a.card.dataset.slideOrder ?? a.index)-Number(b.card.dataset.slideOrder ?? b.index)))
+      .map(({card})=>card);
     const layout=stage.parentElement;
     const contents=layout?.querySelector('.contents');
-    const links=[...(contents?.querySelectorAll('a') || [])];
+    const nav=contents?.querySelector('nav');
+    const allLinks=[...(nav?.querySelectorAll('a') || [])];
+    cards.forEach(card=>stage.append(card));
+    const links=cards.map(card=>allLinks.find(link=>link.hash===`#${card.id}`)).filter(Boolean);
+    const track=nav?.querySelector('.reading-track');
+    links.forEach(link=>track ? nav.insertBefore(link,track) : nav.append(link));
     if(!cards.length) return;
     layout?.classList.add('work-carousel-layout');
     stage.classList.add('work-carousel');
