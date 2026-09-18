@@ -68,21 +68,24 @@
     document.querySelectorAll('.reveal, .case-heading-inner').forEach(node => reveal.observe(node));
   }
 
-  function setupWorkCarousel(stage) {
-    const cards=[...stage.querySelectorAll('.entry')];
-    const layout=stage.parentElement;
-    const contents=layout?.querySelector('.contents');
-    const links=[...(contents?.querySelectorAll('a') || [])];
-    if(!cards.length) return;
-    layout?.classList.add('work-carousel-layout');
-    stage.classList.add('work-carousel');
-    let active=0, dragging=false, startX=0, dragX=0, suppressClick=false;
-    const wrap=(index)=>((index%cards.length)+cards.length)%cards.length;
-    const toggleFace=(card)=>card.classList.toggle('is-flipped');
-    cards.forEach((card,index)=>{
-      card.classList.add('work-card','has-details');
-      const heading=card.querySelector('.case-heading');
-      const content=card.querySelector('.case-content');
+  // Reusable slide element. Add another <article class="entry"> inside a
+  // research/projects .entries container and it inherits the full card system.
+  class WorkSlide {
+    constructor(entry,index,{stage,gesture,getActive,goTo,toggleFace}) {
+      this.entry=entry;
+      this.index=index;
+      this.stage=stage;
+      this.gesture=gesture;
+      this.getActive=getActive;
+      this.goTo=goTo;
+      this.toggleFace=toggleFace;
+    }
+    mount() {
+      const {entry,index,stage,gesture}=this;
+      entry.classList.add('work-card','has-details');
+      entry.dataset.slideIndex=String(index);
+      const heading=entry.querySelector('.case-heading');
+      const content=entry.querySelector('.case-content');
       const front=document.createElement('div'); front.className='work-face work-face-front';
       const back=document.createElement('div'); back.className='work-face work-face-back';
       if(heading) front.append(heading);
@@ -92,38 +95,53 @@
       front.append(cue);
       if(content) back.append(content);
       const inner=document.createElement('div'); inner.className='work-card-inner'; inner.append(front,back);
-      card.replaceChildren(inner); card.tabIndex=0; card.setAttribute('role','button');
-      card.setAttribute('aria-label',`${heading?.querySelector('h2')?.textContent?.trim() || 'Work'} — click for details`);
-      card.addEventListener('click',event=>{
+      entry.replaceChildren(inner); entry.tabIndex=0; entry.setAttribute('role','button');
+      entry.setAttribute('aria-label',`${heading?.querySelector('h2')?.textContent?.trim() || 'Work'} — click for details`);
+      entry.addEventListener('click',event=>{
         if(event.target.closest('a')) return;
-        if(suppressClick){ suppressClick=false; return; }
-        if(index!==active){ goTo(index); return; }
-        toggleFace(card);
+        if(gesture.suppressClick){ gesture.suppressClick=false; return; }
+        if(index!==this.getActive()){ this.goTo(index); return; }
+        this.toggleFace(entry);
       });
-      card.addEventListener('keydown',event=>{
-        if(event.key==='Enter' || event.key===' ') { event.preventDefault(); toggleFace(card); }
-        if(event.key==='ArrowRight') { event.preventDefault(); goTo(index+1); }
-        if(event.key==='ArrowLeft') { event.preventDefault(); goTo(index-1); }
+      entry.addEventListener('keydown',event=>{
+        if(event.key==='Enter' || event.key===' ') { event.preventDefault(); this.toggleFace(entry); }
+        if(event.key==='ArrowRight') { event.preventDefault(); this.goTo(index+1); }
+        if(event.key==='ArrowLeft') { event.preventDefault(); this.goTo(index-1); }
       });
-      card.addEventListener('pointerdown',event=>{
+      entry.addEventListener('pointerdown',event=>{
         if(event.pointerType==='mouse' && event.button!==0) return;
-        dragging=true; suppressClick=false; startX=event.clientX; dragX=0; stage.classList.add('is-dragging'); card.setPointerCapture?.(event.pointerId);
+        gesture.dragging=true; gesture.suppressClick=false; gesture.startX=event.clientX; gesture.dragX=0; stage.classList.add('is-dragging'); entry.setPointerCapture?.(event.pointerId);
       });
-      card.addEventListener('pointermove',event=>{
-        if(!dragging || index!==active) return;
-        dragX=event.clientX-startX; card.style.setProperty('--drag-x',`${dragX}px`);
-        if(Math.abs(dragX)>10) suppressClick=true;
+      entry.addEventListener('pointermove',event=>{
+        if(!gesture.dragging || index!==this.getActive()) return;
+        gesture.dragX=event.clientX-gesture.startX; entry.style.setProperty('--drag-x',`${gesture.dragX}px`);
+        if(Math.abs(gesture.dragX)>10) gesture.suppressClick=true;
       });
       const finishDrag=()=>{
-        if(!dragging || index!==active) return;
-        dragging=false; card.style.setProperty('--drag-x','0px'); stage.classList.remove('is-dragging');
-        if(dragX<-78) goTo(active+1);
-        else if(dragX>78) goTo(active-1);
-        dragX=0;
+        if(!gesture.dragging || index!==this.getActive()) return;
+        gesture.dragging=false; entry.style.setProperty('--drag-x','0px'); stage.classList.remove('is-dragging');
+        if(gesture.dragX<-78) this.goTo(this.getActive()+1);
+        else if(gesture.dragX>78) this.goTo(this.getActive()-1);
+        gesture.dragX=0;
       };
-      card.addEventListener('pointerup',finishDrag);
-      card.addEventListener('pointercancel',finishDrag);
-    });
+      entry.addEventListener('pointerup',finishDrag);
+      entry.addEventListener('pointercancel',finishDrag);
+      return this;
+    }
+  }
+
+  function setupWorkCarousel(stage) {
+    const cards=[...stage.querySelectorAll('.entry')];
+    const layout=stage.parentElement;
+    const contents=layout?.querySelector('.contents');
+    const links=[...(contents?.querySelectorAll('a') || [])];
+    if(!cards.length) return;
+    layout?.classList.add('work-carousel-layout');
+    stage.classList.add('work-carousel');
+    let active=0;
+    const gesture={dragging:false,startX:0,dragX:0,suppressClick:false};
+    const wrap=(index)=>((index%cards.length)+cards.length)%cards.length;
+    const toggleFace=(card)=>card.classList.toggle('is-flipped');
     function goTo(index) {
       active=wrap(index); cards.forEach(card=>card.classList.remove('is-flipped')); render();
     }
@@ -145,6 +163,7 @@
         if(index===active) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current');
       });
     }
+    cards.map((card,index)=>new WorkSlide(card,index,{stage,gesture,getActive:()=>active,goTo,toggleFace}).mount());
     links.forEach((link,index)=>link.addEventListener('click',event=>{event.preventDefault(); goTo(index);}));
     render();
   }
